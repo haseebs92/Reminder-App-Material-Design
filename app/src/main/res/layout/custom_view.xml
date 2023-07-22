@@ -21,7 +21,7 @@
         android:id="@+id/todoText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/merriweather_sans_bold"
+        android:fontFamily="@font/lato"
         android:text="REMINDER"
         android:textColor="#000"
         app:layout_constraintBottom_toBottomOf="@+id/todoCheckBox"

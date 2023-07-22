@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:fontFamily="@font/merriweather_sans_bold"
+            android:fontFamily="@font/lato"
             android:textColor="#000"
             android:textSize="15sp" />
     </ViewFlipper>
