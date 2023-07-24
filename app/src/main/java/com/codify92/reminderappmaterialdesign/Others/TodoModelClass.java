@@ -2,6 +2,9 @@ package com.codify92.reminderappmaterialdesign.Others;
 
 public class TodoModelClass {
     private String text;
+
+    private String subtext;
+
     private int priority;
     private boolean completed;
     private CharSequence date;
@@ -16,6 +19,14 @@ public class TodoModelClass {
 
     public String getText() {
         return text;
+    }
+
+    public String getSubtext() {
+        return subtext;
+    }
+
+    public void setSubtext(String subtext) {
+        this.subtext = subtext;
     }
 
     public void setText(String text) {

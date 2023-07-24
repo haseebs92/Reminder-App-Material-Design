@@ -1,12 +1,9 @@
 package com.codify92.reminderappmaterialdesign.Activities;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -14,7 +11,6 @@ import android.view.View;
 
 
 import com.codify92.reminderappmaterialdesign.Adapter.TodoAdapter;
-import com.codify92.reminderappmaterialdesign.ForgroundService.TodoListService;
 import com.codify92.reminderappmaterialdesign.Others.BottomSheetDialog;
 import com.codify92.reminderappmaterialdesign.Others.TodoModelClass;
 import com.codify92.reminderappmaterialdesign.R;
@@ -22,8 +18,6 @@ import com.codify92.reminderappmaterialdesign.SQLiteDatabse.SQLiteConstants;
 import com.codify92.reminderappmaterialdesign.SQLiteDatabse.SQLiteDatabaseHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-
-import android.os.Bundle;
 
 import java.util.ArrayList;
 
@@ -71,9 +65,6 @@ public class MainActivity extends AppCompatActivity implements BottomSheetDialog
                 todoArrayList.add(todoModelClass);
             } while (c.moveToNext());
         }
-        if (todoArrayList.size() > 0) {
-            sendNotification(todoArrayList.get(0).getText());
-        }
     }
 
     private void addTaskClickListener() {
@@ -107,20 +98,8 @@ public class MainActivity extends AppCompatActivity implements BottomSheetDialog
         //TODO:Notify Adapter
         mAdapter.notifyDataSetChanged();
 
-        sendNotification(EnteredText);
 
     }
 
-    private void sendNotification(String text) {
-        Intent serviceIntent = new Intent(this, TodoListService.class);
-        serviceIntent.putExtra("title",text);
-        ContextCompat.startForegroundService(this,serviceIntent);
 
-//        startService(serviceIntent);
-    }
-
-    private void stopService(){
-        Intent serviceIntent = new Intent(this, TodoListService.class);
-        stopService(serviceIntent);
-    }
 }

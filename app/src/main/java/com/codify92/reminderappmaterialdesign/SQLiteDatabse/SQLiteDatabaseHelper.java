@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "TodoList.db";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
     public SQLiteDatabaseHelper(@NonNull Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -22,6 +22,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 SQLiteConstants.TodoEntry.TABLE_NAME + " (" +
                 SQLiteConstants.TodoEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 SQLiteConstants.TodoEntry.COLUMN_TITLE_TEXT + " TEXT NOT NULL, " +
+                SQLiteConstants.TodoEntry.COLUMN_SUBTEXT + " TEXT NOT NULL, " +
                 SQLiteConstants.TodoEntry.COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
                 SQLiteConstants.TodoEntry.COLUMN_DATE + " TEXT NOT NULL " +
                 ");";
