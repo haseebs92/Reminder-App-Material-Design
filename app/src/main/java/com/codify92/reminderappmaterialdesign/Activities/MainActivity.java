@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -72,8 +73,11 @@ public class MainActivity extends AppCompatActivity implements BottomSheetDialog
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BottomSheetDialog bottomSheet = new BottomSheetDialog();
-                bottomSheet.show(getSupportFragmentManager(), "First");
+
+                startActivity(new Intent(MainActivity.this,CreateNewReminder.class));
+
+//                BottomSheetDialog bottomSheet = new BottomSheetDialog();
+//                bottomSheet.show(getSupportFragmentManager(), "First");
             }
         });
     }
