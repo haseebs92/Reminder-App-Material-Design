@@ -3,11 +3,21 @@ package com.codify92.reminderappmaterialdesign.Others;
 public class TodoModelClass {
     private String text;
 
+    private String chosenColor;
+
     private String subtext;
 
     private int priority;
     private boolean completed;
     private CharSequence date;
+
+    public String getChosenColor() {
+        return chosenColor;
+    }
+
+    public void setChosenColor(String chosenColor) {
+        this.chosenColor = chosenColor;
+    }
 
     public CharSequence getDate() {
         return date;

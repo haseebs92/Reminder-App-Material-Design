@@ -8,11 +8,27 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="text_color_light">#000000</color>
-    <color name="text_color_dark">#ffffff</color>
+    <color name="text_color">#000000</color>
+    <color name="background_color">#ffffff</color>
+    <color name="cardBackgroundColor">#1f9bc0</color>
+    <color name="ui_elements_color">#000000</color>
 
-    <color name="cardBackgroundColorLight">#1f9bc0</color>
-    <color name="cardBackgroundColorDark">#1f9bc0</color>
+    <color name="second_screen_background">#f5f5f5</color>
+
+
+    <color name="card_blue">#7fccf9</color>
+    <color name="card_light_pink">#ffa6c4</color>
+    <color name="card_green">#1eccc3</color>
+    <color name="card_light_purple">#ffa3a3</color>
+    <color name="card_orange">#ffa447</color>
+    <color name="card_light">#AA7AFF</color>
+
+
+
+
+
+
+
 
 
 </resources>

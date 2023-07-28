@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="text_color">#ffffff</color>
+    <color name="background_color">#2B2A2A</color>
+    <color name="cardBackgroundColor">#1f9bc0</color>
+    <color name="ui_elements_color">#ffffff</color>
+
+    <color name="second_screen_background">#2B2A2A</color>
+
+    <color name="card_blue">#568AA8</color>
+    <color name="card_light_pink">#C38096</color>
+    <color name="card_green">#18A69F</color>
+    <color name="card_light_purple">#CA8181</color>
+    <color name="card_orange">#B67533</color>
+    <color name="card_light">#7756B3</color>
+
+</resources>

@@ -7,7 +7,9 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 
@@ -15,6 +17,7 @@ import com.codify92.reminderappmaterialdesign.Others.TodoModelClass;
 import com.codify92.reminderappmaterialdesign.R;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
 
@@ -24,13 +27,20 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView mTodoText;
-        CheckBox mCheckBox;
+        TextView mReminderTitle;
+        TextView mReminderDetails;
+        TextView mReminderDate;
+
+        CardView mCustomCardView;
+
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            mTodoText = itemView.findViewById(R.id.todoText);
-            mCheckBox = itemView.findViewById(R.id.todoCheckBox);
+            mReminderTitle = itemView.findViewById(R.id.todoText);
+            mReminderDetails = itemView.findViewById(R.id.subtext);
+            mReminderDate = itemView.findViewById(R.id.timeAndDate);
+            mCustomCardView = itemView.findViewById(R.id.custom_card);
         }
     }
 
@@ -49,8 +59,15 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        holder.mTodoText.setText(todoArrayList.get(position).getText());
-        holder.mCheckBox.setChecked(todoArrayList.get(position).isCompleted());
+        holder.mReminderTitle.setText(todoArrayList.get(position).getText());
+        holder.mReminderDetails.setText(todoArrayList.get(position).getSubtext());
+        holder.mReminderDate.setText(todoArrayList.get(position).getDate());
+        Random random = new Random();
+        int number = random.nextInt(7);
+
+//        holder.mCustomCardView.setBackgroundColor(Integer.parseInt("#010f01"));
+
+
 
     }
 
