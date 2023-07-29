@@ -3,19 +3,17 @@ package com.codify92.reminderappmaterialdesign.Others;
 public class TodoModelClass {
     private String text;
 
-    private String chosenColor;
+    private int chosenColor;
 
     private String subtext;
 
-    private int priority;
-    private boolean completed;
     private CharSequence date;
 
-    public String getChosenColor() {
+    public int getChosenColor() {
         return chosenColor;
     }
 
-    public void setChosenColor(String chosenColor) {
+    public void setChosenColor(int chosenColor) {
         this.chosenColor = chosenColor;
     }
 
@@ -43,19 +41,4 @@ public class TodoModelClass {
         this.text = text;
     }
 
-    public int getPriority() {
-        return priority;
-    }
-
-    public void setPriority(int priority) {
-        this.priority = priority;
-    }
-
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
 }

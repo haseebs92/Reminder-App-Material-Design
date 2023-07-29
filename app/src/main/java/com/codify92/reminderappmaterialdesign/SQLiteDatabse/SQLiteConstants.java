@@ -8,10 +8,12 @@ public class SQLiteConstants {
 
     public static final class TodoEntry implements BaseColumns {
 
-        public static final String TABLE_NAME  = "todoList";
+        public static final String TABLE_NAME  = "reminderList";
         public static final String COLUMN_TITLE_TEXT  = "text";
 
         public static final String COLUMN_SUBTEXT  = "subtext";
+        public static final String COLUMN_BACKGROUND_COLOR  = "color";
+
         public static final String COLUMN_DATE = "date";
         public static final String COLUMN_TIMESTAMP = "timestamp";
     }

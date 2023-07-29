@@ -13,6 +13,6 @@
     <color name="card_green">#18A69F</color>
     <color name="card_light_purple">#CA8181</color>
     <color name="card_orange">#B67533</color>
-    <color name="card_light">#7756B3</color>
+    <color name="card_dark_purple">#7756B3</color>
 
 </resources>

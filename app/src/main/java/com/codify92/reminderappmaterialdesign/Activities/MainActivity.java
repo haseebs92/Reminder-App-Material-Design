@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
     public static SQLiteDatabaseHelper dbHelper;
     public static SQLiteDatabase mDatabase;
 
+    public static boolean cameFromSecondScreen = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,11 +97,13 @@ public class MainActivity extends AppCompatActivity {
             do {
                 TodoModelClass todoModelClass = new TodoModelClass();
                 todoModelClass.setText(c.getString(c.getColumnIndexOrThrow(SQLiteConstants.TodoEntry.COLUMN_TITLE_TEXT)));
+                todoModelClass.setSubtext(c.getString(c.getColumnIndexOrThrow(SQLiteConstants.TodoEntry.COLUMN_SUBTEXT)));
+
                 todoModelClass.setDate(c.getString(c.getColumnIndexOrThrow(SQLiteConstants.TodoEntry.COLUMN_DATE)));
+                todoModelClass.setChosenColor(Integer.parseInt(c.getString(c.getColumnIndexOrThrow(SQLiteConstants.TodoEntry.COLUMN_BACKGROUND_COLOR))));
                 todoArrayList.add(todoModelClass);
             } while (c.moveToNext());
         }
-//        Toast.makeText(this, ""+ todoArrayList.get(0).getText(), Toast.LENGTH_SHORT).show();
     }
 
     private void addTaskClickListener() {
@@ -119,8 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
                 ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this,pair);
                 startActivity(intent,options.toBundle());
-//                BottomSheetDialog bottomSheet = new BottomSheetDialog();
-//                bottomSheet.show(getSupportFragmentManager(), "First");
+
             }
         });
     }
@@ -151,6 +154,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mAdapter.notifyDataSetChanged();
+        if (cameFromSecondScreen){
+            recreate();
+            cameFromSecondScreen = false;
+        }
     }
 }

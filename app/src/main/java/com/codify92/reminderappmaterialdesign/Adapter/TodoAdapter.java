@@ -1,15 +1,18 @@
 package com.codify92.reminderappmaterialdesign.Adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 
@@ -62,12 +65,21 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
         holder.mReminderTitle.setText(todoArrayList.get(position).getText());
         holder.mReminderDetails.setText(todoArrayList.get(position).getSubtext());
         holder.mReminderDate.setText(todoArrayList.get(position).getDate());
-        Random random = new Random();
-        int number = random.nextInt(7);
 
-//        holder.mCustomCardView.setBackgroundColor(Integer.parseInt("#010f01"));
-
-
+        int number = todoArrayList.get(position).getChosenColor();
+        if (number == 1){
+            holder.mCustomCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_blue));
+        } else if (number == 2) {
+            holder.mCustomCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_green));
+        }else if (number == 3) {
+            holder.mCustomCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_light_pink));
+        }else if (number == 4) {
+            holder.mCustomCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_orange));
+        }else if (number == 5) {
+            holder.mCustomCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_light_purple));
+        }else if (number == 6) {
+            holder.mCustomCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_dark_purple));
+        }
 
     }
 

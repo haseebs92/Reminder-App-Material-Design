@@ -9,8 +9,8 @@ import androidx.annotation.NonNull;
 
 public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
-    public static final String DATABASE_NAME = "TodoList.db";
-    public static final int DATABASE_VERSION = 2;
+    public static final String DATABASE_NAME = "reminderList.db";
+    public static final int DATABASE_VERSION = 4;
 
     public SQLiteDatabaseHelper(@NonNull Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -23,6 +23,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 SQLiteConstants.TodoEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 SQLiteConstants.TodoEntry.COLUMN_TITLE_TEXT + " TEXT NOT NULL, " +
                 SQLiteConstants.TodoEntry.COLUMN_SUBTEXT + " TEXT NOT NULL, " +
+                SQLiteConstants.TodoEntry.COLUMN_BACKGROUND_COLOR + " TEXT NOT NULL, " +
                 SQLiteConstants.TodoEntry.COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
                 SQLiteConstants.TodoEntry.COLUMN_DATE + " TEXT NOT NULL " +
                 ");";
@@ -43,24 +44,24 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return data;
     }
 
-    public void removeFromDatabase(String title){
-
-        SQLiteDatabase db = getReadableDatabase();
-        String selectQuery = String.format("DELETE FROM todoList WHERE text='%s';",title  );
-        db.execSQL(selectQuery);
-    }
-
-    public String getName (String id){
-        SQLiteDatabase db = getReadableDatabase();
-        String selectQuery = String.format("SELECT  * FROM studentInfo WHERE studentid='%s';",id);
-        Cursor cursor = db.rawQuery(selectQuery,null);
-        if (cursor != null){
-            if (cursor.moveToFirst()){
-                int nameFieldColumnIndex = cursor.getColumnIndex(SQLiteConstants.TodoEntry.COLUMN_TITLE_TEXT);
-                String name = cursor.getString(nameFieldColumnIndex);
-                return name;
-            }
-        }
-        return "Empty";
-    }
+//    public void removeFromDatabase(String title){
+//
+//        SQLiteDatabase db = getReadableDatabase();
+//        String selectQuery = String.format("DELETE FROM todoList WHERE text='%s';",title  );
+//        db.execSQL(selectQuery);
+//    }
+//
+//    public String getName (String id){
+//        SQLiteDatabase db = getReadableDatabase();
+//        String selectQuery = String.format("SELECT  * FROM studentInfo WHERE studentid='%s';",id);
+//        Cursor cursor = db.rawQuery(selectQuery,null);
+//        if (cursor != null){
+//            if (cursor.moveToFirst()){
+//                int nameFieldColumnIndex = cursor.getColumnIndex(SQLiteConstants.TodoEntry.COLUMN_TITLE_TEXT);
+//                String name = cursor.getString(nameFieldColumnIndex);
+//                return name;
+//            }
+//        }
+//        return "Empty";
+//    }
 }
