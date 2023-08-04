@@ -3,7 +3,10 @@ package com.codify92.reminderappmaterialdesign.Activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.transition.Fade;
@@ -12,9 +15,11 @@ import android.transition.TransitionManager;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.codify92.reminderappmaterialdesign.Others.TodoModelClass;
@@ -25,6 +30,7 @@ import com.codify92.reminderappmaterialdesign.SQLiteDatabse.SQLiteDatabaseHelper
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class CreateNewReminder extends AppCompatActivity implements View.OnClickListener {
 
@@ -33,6 +39,8 @@ public class CreateNewReminder extends AppCompatActivity implements View.OnClick
 
     ImageView mFabDone;
     ImageView mBackButton;
+
+    ImageView datePicker;
     CardView mBackgroundGreen;
     CardView mBackgroundLightPurple;
     CardView mBackgroundPink;
@@ -49,6 +57,17 @@ public class CreateNewReminder extends AppCompatActivity implements View.OnClick
 
     int chosenBackgroundColor = 1;
 
+    String chosenDateForReminder = "";
+    String chosenTimeForReminder = "";
+
+    String finalDateAndTime;
+
+    boolean isUpdating = false;
+    int position;
+
+    String titleToUpdate;
+    String subtextToUpdate;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +78,12 @@ public class CreateNewReminder extends AppCompatActivity implements View.OnClick
 
         setAnimationForTransition();
         initialize();
+        getIntentData();
         saveReminder();
         otherFunctions();
     }
 
     private void setAnimationForTransition() {
-
 
         Fade fade = new Fade();
         View decor = getWindow().getDecorView();
@@ -87,6 +106,7 @@ public class CreateNewReminder extends AppCompatActivity implements View.OnClick
         mFabDone = findViewById(R.id.fabDone);
         mBackButton = findViewById(R.id.backBtn);
         mBottomCard = findViewById(R.id.bottomCard);
+        datePicker = findViewById(R.id.dateBtn);
 
         //Bottom Color Selector For Reminder ID's
         mBackgroundBlue = findViewById(R.id.cardBlue);
@@ -113,48 +133,163 @@ public class CreateNewReminder extends AppCompatActivity implements View.OnClick
 
     }
 
+    private void getIntentData() {
+        Intent intent = getIntent();
+        if (intent == null) {
+
+        } else {
+
+            try {
+                titleToUpdate = getIntent().getStringExtra("title");
+                subtextToUpdate = getIntent().getStringExtra("subtext");
+                isUpdating = getIntent().getBooleanExtra("isupdate", false);
+                position = getIntent().getIntExtra("position",0);
+                finalDateAndTime = getIntent().getStringExtra("date");
+                if (!titleToUpdate.equals("")) {
+                    reminderTitle.setText(titleToUpdate);
+                }
+                if (!subtextToUpdate.equals("")) {
+                    reminderSubtext.setText(subtextToUpdate);
+                }
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
     private void saveReminder() {
         mFabDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String EnteredText = reminderTitle.getText().toString();
-                String Subtext = reminderSubtext.getText().toString();
-                String Date = "July 4,2023";
+                if (!isUpdating) {
+                    String EnteredText = reminderTitle.getText().toString();
+                    String Subtext = reminderSubtext.getText().toString();
+                    finalDateAndTime = chosenDateForReminder + chosenTimeForReminder;
 
-                if (!EnteredText.equals("") || !Subtext.equals("")){
-                    //TODO:Add To Array List
-                    TodoModelClass modelClass = new TodoModelClass();
-                    modelClass.setText(EnteredText);
-                    modelClass.setSubtext(Subtext);
-                    modelClass.setChosenColor(chosenBackgroundColor);
-                    modelClass.setDate(Date);
-                    todoArrayList.add(modelClass);
+                    if (!EnteredText.equals("") || !Subtext.equals("")) {
+                        //TODO:Add To Array List
+                        TodoModelClass modelClass = new TodoModelClass();
+                        modelClass.setText(EnteredText);
+                        modelClass.setSubtext(Subtext);
+                        modelClass.setChosenColor(chosenBackgroundColor);
+                        modelClass.setDate(finalDateAndTime);
+                        todoArrayList.add(modelClass);
 
-                    //TODO: Save To Database
-                    ContentValues cv = new ContentValues();
-                    cv.put(SQLiteConstants.TodoEntry.COLUMN_TITLE_TEXT, EnteredText);
-                    cv.put(SQLiteConstants.TodoEntry.COLUMN_SUBTEXT, Subtext);
-                    cv.put(String.valueOf(SQLiteConstants.TodoEntry.COLUMN_BACKGROUND_COLOR),chosenBackgroundColor);
-                    cv.put(SQLiteConstants.TodoEntry.COLUMN_DATE, String.valueOf(Date));
-                    mDatabase.insert(SQLiteConstants.TodoEntry.TABLE_NAME, null, cv);
+                        //TODO: Save To Database
+                        ContentValues cv = new ContentValues();
+                        cv.put(SQLiteConstants.TodoEntry.COLUMN_TITLE_TEXT, EnteredText);
+                        cv.put(SQLiteConstants.TodoEntry.COLUMN_SUBTEXT, Subtext);
+                        cv.put(String.valueOf(SQLiteConstants.TodoEntry.COLUMN_BACKGROUND_COLOR), chosenBackgroundColor);
+                        cv.put(SQLiteConstants.TodoEntry.COLUMN_DATE, String.valueOf(finalDateAndTime));
+                        mDatabase.insert(SQLiteConstants.TodoEntry.TABLE_NAME, null, cv);
 
-                    finish();
-                    MainActivity.cameFromSecondScreen = true;
-                } else Toast.makeText(CreateNewReminder.this, "Please Enter Some Text!", Toast.LENGTH_SHORT).show();
+                        finish();
+                        MainActivity.cameFromSecondScreen = true;
+                    } else
+                        Toast.makeText(CreateNewReminder.this, "Please Enter Some Text!", Toast.LENGTH_SHORT).show();
 
+                } else {
+                    updateReminder();
+                }
             }
         });
 
     }
 
-    private void otherFunctions(){
+    private void updateReminder(){
+        String EnteredText = reminderTitle.getText().toString();
+        String Subtext = reminderSubtext.getText().toString();
+        finalDateAndTime = chosenDateForReminder + chosenTimeForReminder;
+
+        if (!EnteredText.equals("") || !Subtext.equals("")) {
+            //TODO: Update In Database
+            ContentValues cv = new ContentValues();
+            cv.put(SQLiteConstants.TodoEntry.COLUMN_TITLE_TEXT, EnteredText);
+            cv.put(SQLiteConstants.TodoEntry.COLUMN_SUBTEXT, Subtext);
+            cv.put(String.valueOf(SQLiteConstants.TodoEntry.COLUMN_BACKGROUND_COLOR), chosenBackgroundColor);
+            cv.put(SQLiteConstants.TodoEntry.COLUMN_DATE, finalDateAndTime);
+
+            if (!titleToUpdate.equals("")){
+                mDatabase.update(SQLiteConstants.TodoEntry.TABLE_NAME,cv,"text = ?", new String[]{titleToUpdate});
+            } else {
+                mDatabase.update(SQLiteConstants.TodoEntry.TABLE_NAME,cv,"subtext = ?", new String[]{subtextToUpdate});
+            }
+
+            finish();
+            MainActivity.cameFromSecondScreen = true;
+        } else
+            Toast.makeText(CreateNewReminder.this, "Please Enter Some Text!", Toast.LENGTH_SHORT).show();
+
+    }
+
+    private void otherFunctions() {
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
             }
         });
+
+        datePicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getDateDialog();
+            }
+        });
     }
+
+    private void getDateDialog() {
+        //Getting Current Date To Set On Date Picker
+        Calendar calendar = Calendar.getInstance();
+
+        int mYear = calendar.get(Calendar.YEAR);
+        int mMonth = calendar.get(Calendar.MONTH);
+        int mDay = calendar.get(Calendar.DAY_OF_MONTH);
+
+        //Creating Date Picker Dialog
+        DatePickerDialog dialog = new DatePickerDialog(CreateNewReminder.this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                //Formatting The Date And Adding To Date Variable
+                if (year == mYear && month == mMonth && day == mDay) {
+                    chosenDateForReminder = "Today";
+                } else if (year == mYear && month == mMonth && day == mDay + 1) {
+                    chosenDateForReminder = "Tomorrow";
+                } else {
+                    String[] nameOfMonth = {"Jan", "Feb", "March", "April",
+                            "May", "June", "july", "Aug",
+                            "Sep", "Oct", "Nov", "Dec"};
+
+                    chosenDateForReminder = day + " " + nameOfMonth[month];
+                }
+
+                getTimeDialog();
+            }
+        }, mYear, mMonth, mDay);
+
+        dialog.show();
+    }
+
+    private void getTimeDialog() {
+        Calendar calendar = Calendar.getInstance();
+
+        int mHour = calendar.get(Calendar.HOUR);
+        int mMinute = calendar.get(Calendar.MINUTE);
+
+
+        TimePickerDialog dialog = new TimePickerDialog(CreateNewReminder.this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+                if (minute == 0) {
+                    chosenTimeForReminder = ", " + hour + ":" + "00";
+                } else {
+                    chosenTimeForReminder = ", " + hour + ":" + minute;
+                }
+            }
+        }, mHour, mMinute, false);
+        dialog.show();
+    }
+
 
     @Override
     public void onClick(View v) {

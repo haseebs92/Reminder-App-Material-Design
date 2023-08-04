@@ -1,15 +1,11 @@
 package com.codify92.reminderappmaterialdesign.Adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
@@ -20,14 +16,29 @@ import com.codify92.reminderappmaterialdesign.Others.TodoModelClass;
 import com.codify92.reminderappmaterialdesign.R;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
 
     private ArrayList<TodoModelClass> todoArrayList;
     private Context context;
 
+    private OnItemClickListener mListener;
+    private OnItemLongClickListener mLongListener;
 
+
+    public interface OnItemClickListener{
+        void onItemClick(int position);
+    }
+    public void setOnItemClickListener(OnItemClickListener listener){
+        mListener = listener;
+    }
+    public interface OnItemLongClickListener {
+        void onItemLongClick(int position);
+    }
+
+    public void setOnItemLongClickListener(OnItemLongClickListener longListener){
+        mLongListener = longListener;
+    }
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView mReminderTitle;
@@ -38,12 +49,37 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
 
 
 
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView,OnItemClickListener listener,OnItemLongClickListener longClickListener) {
             super(itemView);
             mReminderTitle = itemView.findViewById(R.id.todoText);
             mReminderDetails = itemView.findViewById(R.id.subtext);
             mReminderDate = itemView.findViewById(R.id.timeAndDate);
             mCustomCardView = itemView.findViewById(R.id.custom_card);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (listener != null){
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION){
+                            listener.onItemClick(position);
+                        }
+                    }
+                }
+            });
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (longClickListener != null){
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION){
+                            longClickListener.onItemLongClick(position);
+                        }
+                    }
+                    return true;
+                }
+            });
         }
     }
 
@@ -56,15 +92,27 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.custom_view, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(view,mListener,mLongListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        holder.mReminderTitle.setText(todoArrayList.get(position).getText());
-        holder.mReminderDetails.setText(todoArrayList.get(position).getSubtext());
-        holder.mReminderDate.setText(todoArrayList.get(position).getDate());
+        if (todoArrayList.get(position).getText().equals("")){
+            holder.mReminderTitle.setVisibility(View.GONE);
+        } else {
+            holder.mReminderTitle.setText(todoArrayList.get(position).getText());
+        }
+        if (todoArrayList.get(position).getSubtext().equals("")){
+            holder.mReminderDetails.setVisibility(View.GONE);
+        } else {
+            holder.mReminderDetails.setText(todoArrayList.get(position).getSubtext());
+        }
+        if (todoArrayList.get(position).getDate().equals("")){
+            holder.mReminderDate.setVisibility(View.GONE);
+        } else {
+            holder.mReminderDate.setText(todoArrayList.get(position).getDate());
+        }
 
         int number = todoArrayList.get(position).getChosenColor();
         if (number == 1){
@@ -87,5 +135,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
     public int getItemCount() {
         return todoArrayList.size();
     }
+
+
 
 }

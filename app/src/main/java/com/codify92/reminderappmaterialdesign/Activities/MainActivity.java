@@ -4,10 +4,9 @@ import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.util.Pair;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -18,16 +17,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.codify92.reminderappmaterialdesign.Adapter.TodoAdapter;
-import com.codify92.reminderappmaterialdesign.Others.BottomSheetDialog;
 import com.codify92.reminderappmaterialdesign.Others.TodoModelClass;
 import com.codify92.reminderappmaterialdesign.R;
 import com.codify92.reminderappmaterialdesign.SQLiteDatabse.SQLiteConstants;
 import com.codify92.reminderappmaterialdesign.SQLiteDatabse.SQLiteDatabaseHelper;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 
 import java.util.ArrayList;
@@ -60,11 +56,48 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new TodoAdapter(this, todoArrayList);
 
         mRecyclerView = findViewById(R.id.todayRecyclerView);
-        layoutManager = new GridLayoutManager(MainActivity.this,2);
+        layoutManager = new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
         addTaskClickListener();
+        reminderClickListener();
+    }
+
+    private void reminderClickListener(){
+        mAdapter.setOnItemClickListener(new TodoAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+               String title = todoArrayList.get(position).getText();
+               String subtext = todoArrayList.get(position).getSubtext();
+               String date = String.valueOf(todoArrayList.get(position).getDate());
+
+               Intent intent = new Intent(MainActivity.this,CreateNewReminder.class);
+               intent.putExtra("title", title);
+               intent.putExtra("subtext", subtext);
+               intent.putExtra("isupdate", true);
+               intent.putExtra("position",position);
+               intent.putExtra("date",date);
+               startActivity(intent);
+            }
+        });
+
+        mAdapter.setOnItemLongClickListener(new TodoAdapter.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(int position) {
+                String titleToDelete = todoArrayList.get(position).getText();
+                if (!titleToDelete.equals("")){
+                    mDatabase.delete(SQLiteConstants.TodoEntry.TABLE_NAME,
+                            "text = ?", new String[]{titleToDelete});
+                } else {
+                    titleToDelete = todoArrayList.get(position).getSubtext();
+                    mDatabase.delete(SQLiteConstants.TodoEntry.TABLE_NAME,
+                            "subtext = ?", new String[]{titleToDelete});
+                }
+                todoArrayList.remove(position);
+                mAdapter.notifyItemRemoved(position);
+            }
+        });
     }
 
     private void setAnimationForTransition(){
@@ -128,28 +161,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-//    @Override
-//    public void onSaveClicked(String EnteredText, CharSequence Date) {
-//
-//        //TODO:Add To Array List
-//        TodoModelClass modelClass = new TodoModelClass();
-//        modelClass.setText(EnteredText);
-//        modelClass.setDate(Date);
-//        modelClass.setCompleted(false);
-//        modelClass.setPriority(1);
-//        todoArrayList.add(modelClass);
-//
-//        //TODO: Save To Database
-//        ContentValues cv = new ContentValues();
-//        cv.put(SQLiteConstants.TodoEntry.COLUMN_TITLE_TEXT, EnteredText);
-//        cv.put(SQLiteConstants.TodoEntry.COLUMN_DATE, String.valueOf(Date));
-//        mDatabase.insert(SQLiteConstants.TodoEntry.TABLE_NAME, null, cv);
-//
-//        //TODO:Notify Adapter
-//        mAdapter.notifyDataSetChanged();
-//
-//
-//    }
 
     @Override
     protected void onResume() {
