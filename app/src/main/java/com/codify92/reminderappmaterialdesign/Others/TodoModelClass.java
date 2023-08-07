@@ -9,6 +9,8 @@ public class TodoModelClass {
 
     private CharSequence date;
 
+    private boolean isSelected;
+
     public int getChosenColor() {
         return chosenColor;
     }
@@ -41,4 +43,11 @@ public class TodoModelClass {
         this.text = text;
     }
 
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
 }

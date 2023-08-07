@@ -15,4 +15,6 @@
     <color name="card_orange">#B67533</color>
     <color name="card_dark_purple">#7756B3</color>
 
+    <color name="radio_button_background">#FECE2F</color>
+
 </resources>
