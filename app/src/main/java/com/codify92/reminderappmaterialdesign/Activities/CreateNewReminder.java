@@ -1,5 +1,6 @@
 package com.codify92.reminderappmaterialdesign.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
@@ -26,6 +27,12 @@ import com.codify92.reminderappmaterialdesign.Others.TodoModelClass;
 import com.codify92.reminderappmaterialdesign.R;
 import com.codify92.reminderappmaterialdesign.SQLiteDatabse.SQLiteConstants;
 import com.codify92.reminderappmaterialdesign.SQLiteDatabse.SQLiteDatabaseHelper;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 
 import org.w3c.dom.Text;
 
@@ -68,6 +75,9 @@ public class CreateNewReminder extends AppCompatActivity implements View.OnClick
     String titleToUpdate;
     String subtextToUpdate;
 
+    InterstitialAd mInterstitialAd;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +91,7 @@ public class CreateNewReminder extends AppCompatActivity implements View.OnClick
         getIntentData();
         saveReminder();
         otherFunctions();
+        loadInterstitialAd();
     }
 
     private void setAnimationForTransition() {
@@ -96,6 +107,49 @@ public class CreateNewReminder extends AppCompatActivity implements View.OnClick
         getWindow().setEnterTransition(fade);
         getWindow().setExitTransition(fade);
 
+    }
+
+    private void loadInterstitialAd(){
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mInterstitialAd.load(this,getResources().getString(R.string.interstitial), adRequest, new InterstitialAdLoadCallback() {
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                mInterstitialAd = null;
+            }
+
+            @Override
+            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                mInterstitialAd = interstitialAd;
+                interstitialAdCallbacks();
+
+            }
+        });
+
+    }
+
+    private void interstitialAdCallbacks(){
+        mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+            @Override
+            public void onAdClicked() {
+                super.onAdClicked();
+                finish();
+                MainActivity.cameFromSecondScreen = true;
+            }
+
+            @Override
+            public void onAdDismissedFullScreenContent() {
+                super.onAdDismissedFullScreenContent();
+                finish();
+                MainActivity.cameFromSecondScreen = true;
+            }
+
+            @Override
+            public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+                super.onAdFailedToShowFullScreenContent(adError);
+                finish();
+                MainActivity.cameFromSecondScreen = true;
+            }
+        });
     }
 
     private void initialize() {
@@ -183,8 +237,13 @@ public class CreateNewReminder extends AppCompatActivity implements View.OnClick
                         cv.put(SQLiteConstants.TodoEntry.COLUMN_DATE, String.valueOf(finalDateAndTime));
                         mDatabase.insert(SQLiteConstants.TodoEntry.TABLE_NAME, null, cv);
 
-                        finish();
-                        MainActivity.cameFromSecondScreen = true;
+                        if (mInterstitialAd!= null){
+                            mInterstitialAd.show(CreateNewReminder.this);
+                        } else {
+                            finish();
+                            MainActivity.cameFromSecondScreen = true;
+                        }
+
                     } else
                         Toast.makeText(CreateNewReminder.this, "Please Enter Some Text!", Toast.LENGTH_SHORT).show();
 
@@ -282,6 +341,8 @@ public class CreateNewReminder extends AppCompatActivity implements View.OnClick
             public void onTimeSet(TimePicker timePicker, int hour, int minute) {
                 if (minute == 0) {
                     chosenTimeForReminder = ", " + hour + ":" + "00";
+                } else if (minute < 10){
+                    chosenTimeForReminder = ", " + hour + ":" + "0" + minute;
                 } else {
                     chosenTimeForReminder = ", " + hour + ":" + minute;
                 }

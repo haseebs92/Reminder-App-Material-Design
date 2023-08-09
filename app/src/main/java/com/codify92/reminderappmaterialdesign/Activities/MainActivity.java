@@ -1,12 +1,16 @@
 package com.codify92.reminderappmaterialdesign.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.util.Pair;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -24,6 +28,14 @@ import com.codify92.reminderappmaterialdesign.Others.TodoModelClass;
 import com.codify92.reminderappmaterialdesign.R;
 import com.codify92.reminderappmaterialdesign.SQLiteDatabse.SQLiteConstants;
 import com.codify92.reminderappmaterialdesign.SQLiteDatabse.SQLiteDatabaseHelper;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 
@@ -42,16 +54,16 @@ public class MainActivity extends AppCompatActivity {
 
     public static boolean cameFromSecondScreen = false;
 
-    private boolean isSelectingItems = false;
-
-    ImageView mClose;
     ImageView mMenu;
 
     TextView mTitle;
 
-    List<Integer> arrayOfSelectedItems;
+    ConstraintLayout mNoReminderLayout;
 
-    FloatingActionButton mDeleteFab;
+    InterstitialAd mInterstitialAd;
+
+    public static boolean adShown = false;
+
 
 
     @Override
@@ -64,12 +76,10 @@ public class MainActivity extends AppCompatActivity {
 
         setAnimationForTransition();
 
-        mClose = findViewById(R.id.close);
         mMenu = findViewById(R.id.menuRight);
         mTitle = findViewById(R.id.titleText1);
-        mDeleteFab = findViewById(R.id.deleteFab);
+        mNoReminderLayout = findViewById(R.id.noReminderLayout);
 
-        arrayOfSelectedItems = new ArrayList<Integer>();
         todoArrayList = new ArrayList<>();
         setupDatabase();
         getDataFromDatabaseAndAddToArrayList();
@@ -82,29 +92,25 @@ public class MainActivity extends AppCompatActivity {
 
         addTaskClickListener();
         reminderClickListener();
-        onViewsClickListeners();
+        initializeAds();
     }
 
     private void reminderClickListener() {
         mAdapter.setOnItemClickListener(new TodoAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                if (!isSelectingItems) {
-                    String title = todoArrayList.get(position).getText();
-                    String subtext = todoArrayList.get(position).getSubtext();
-                    String date = String.valueOf(todoArrayList.get(position).getDate());
 
-                    Intent intent = new Intent(MainActivity.this, CreateNewReminder.class);
-                    intent.putExtra("title", title);
-                    intent.putExtra("subtext", subtext);
-                    intent.putExtra("isupdate", true);
-                    intent.putExtra("position", position);
-                    intent.putExtra("date", date);
-                    startActivity(intent);
-                } else {
-                    setMultipleReminderSelection(position);
-                }
+                String title = todoArrayList.get(position).getText();
+                String subtext = todoArrayList.get(position).getSubtext();
+                String date = String.valueOf(todoArrayList.get(position).getDate());
 
+                Intent intent = new Intent(MainActivity.this, CreateNewReminder.class);
+                intent.putExtra("title", title);
+                intent.putExtra("subtext", subtext);
+                intent.putExtra("isupdate", true);
+                intent.putExtra("position", position);
+                intent.putExtra("date", date);
+                startActivity(intent);
             }
         });
 
@@ -112,27 +118,31 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemLongClick(int position) {
 
-//                String titleToDelete = todoArrayList.get(position).getText();
-//                if (!titleToDelete.equals("")){
-//                    mDatabase.delete(SQLiteConstants.TodoEntry.TABLE_NAME,
-//                            "text = ?", new String[]{titleToDelete});
-//                } else {
-//                    titleToDelete = todoArrayList.get(position).getSubtext();
-//                    mDatabase.delete(SQLiteConstants.TodoEntry.TABLE_NAME,
-//                            "subtext = ?", new String[]{titleToDelete});
-//                }
-//                todoArrayList.remove(position);
-//                mAdapter.notifyItemRemoved(position);
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Delete Reminder")
+                        .setMessage("Are you sure you want to delete this reminder?")
 
-                isSelectingItems = true;
-                TodoAdapter.isSelecting = true;
-                mClose.setVisibility(View.VISIBLE);
-                mDeleteFab.setVisibility(View.VISIBLE);
-                mMenu.setVisibility(View.GONE);
-                mTitle.setText("Selecting");
-                todoArrayList.get(position).setSelected(true);
-                arrayOfSelectedItems.add(position);
-                mAdapter.notifyDataSetChanged();
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Continue with delete operation
+                                String titleToDelete = todoArrayList.get(position).getText();
+                                if (!titleToDelete.equals("")) {
+                                    mDatabase.delete(SQLiteConstants.TodoEntry.TABLE_NAME,
+                                            "text = ?", new String[]{titleToDelete});
+                                } else {
+                                    titleToDelete = todoArrayList.get(position).getSubtext();
+                                    mDatabase.delete(SQLiteConstants.TodoEntry.TABLE_NAME,
+                                            "subtext = ?", new String[]{titleToDelete});
+                                }
+                                todoArrayList.remove(position);
+                                mAdapter.notifyItemRemoved(position);
+                            }
+                        })
+
+                        // A null listener allows the button to dismiss the dialog and take no further action.
+                        .setNegativeButton(android.R.string.no, null)
+                        .setIcon(android.R.drawable.ic_delete)
+                        .show();
 
             }
         });
@@ -174,7 +184,10 @@ public class MainActivity extends AppCompatActivity {
                 todoModelClass.setDate(c.getString(c.getColumnIndexOrThrow(SQLiteConstants.TodoEntry.COLUMN_DATE)));
                 todoModelClass.setChosenColor(Integer.parseInt(c.getString(c.getColumnIndexOrThrow(SQLiteConstants.TodoEntry.COLUMN_BACKGROUND_COLOR))));
                 todoArrayList.add(todoModelClass);
+                mNoReminderLayout.setVisibility(View.GONE);
             } while (c.moveToNext());
+        } else {
+            mNoReminderLayout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -187,10 +200,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 Intent intent = new Intent(MainActivity.this, CreateNewReminder.class);
-                Pair[] pair = new Pair[3];
+                Pair[] pair = new Pair[2];
                 pair[0] = new Pair<View, String>(fabAddReminder, ViewCompat.getTransitionName(fabAddReminder));
                 pair[1] = new Pair<View, String>(textView, ViewCompat.getTransitionName(textView));
-                pair[2] = new Pair<View, String>(menuRight, ViewCompat.getTransitionName(menuRight));
+//                pair[2] = new Pair<View, String>(menuRight, ViewCompat.getTransitionName(menuRight));
 
 
                 ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this, pair);
@@ -200,61 +213,45 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setMultipleReminderSelection(int position) {
-        if (todoArrayList.get(position).isSelected()) {
-            todoArrayList.get(position).setSelected(false);
-            arrayOfSelectedItems.remove(position);
-        } else {
-            todoArrayList.get(position).setSelected(true);
-            arrayOfSelectedItems.add(position);
-        }
-        mAdapter.notifyDataSetChanged();
+    private void initializeAds(){
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+                // Ads have been initialized
+                showBannerAd();
+                if (!adShown){
+                    loadInterstitialAd();
+                    adShown = true;
+                }
+
+            }
+        });
+
+
     }
 
-    private void onViewsClickListeners(){
-        mClose.setOnClickListener(new View.OnClickListener() {
+    private void showBannerAd(){
+        AdView adView = findViewById(R.id.bannerAdView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
+    }
+
+    private void loadInterstitialAd(){
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mInterstitialAd.load(this,getResources().getString(R.string.interstitial), adRequest, new InterstitialAdLoadCallback() {
             @Override
-            public void onClick(View view) {
-                isSelectingItems = false;
-                TodoAdapter.isSelecting = false;
-                mClose.setVisibility(View.GONE);
-                mMenu.setVisibility(View.VISIBLE);
-                mTitle.setText("Reminders");
-                mDeleteFab.setVisibility(View.GONE);
-                arrayOfSelectedItems.clear();
-                for (int i = 0; i < todoArrayList.size(); i++){
-                    todoArrayList.get(i).setSelected(false);
-                }
-                mAdapter.notifyDataSetChanged();
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                mInterstitialAd = null;
+            }
+
+            @Override
+            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                mInterstitialAd = interstitialAd;
+                mInterstitialAd.show(MainActivity.this);
+
             }
         });
-        mDeleteFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //DELETE SELECTED ITEMS
-                for (int i =0; i< arrayOfSelectedItems.size(); i++){
-                    String titleToDelete = todoArrayList.get(arrayOfSelectedItems.get(i)).getText();
-                    if (!titleToDelete.equals("")) {
-                        mDatabase.delete(SQLiteConstants.TodoEntry.TABLE_NAME,
-                                "text = ?", new String[]{titleToDelete});
-                    } else {
-                        titleToDelete = todoArrayList.get(i).getSubtext();
-                        mDatabase.delete(SQLiteConstants.TodoEntry.TABLE_NAME,
-                                "subtext = ?", new String[]{titleToDelete});
-                    }
-                    int selectedPosition = arrayOfSelectedItems.get(i);
-                    todoArrayList.remove(arrayOfSelectedItems.get(i));
-                    mAdapter.notifyItemRemoved(arrayOfSelectedItems.get(i));
-                }
-                isSelectingItems = false;
-                TodoAdapter.isSelecting = false;
-                mClose.setVisibility(View.GONE);
-                mMenu.setVisibility(View.VISIBLE);
-                mTitle.setText("Reminders");
-                mDeleteFab.setVisibility(View.GONE);
-                arrayOfSelectedItems.clear();
-            }
-        });
+
     }
 
     @Override

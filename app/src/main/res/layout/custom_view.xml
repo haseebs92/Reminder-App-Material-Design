@@ -31,7 +31,7 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="12dp"
                 android:fontFamily="@font/lato"
-                android:text="Reminder Subtext to add more details about the reminder"
+                android:text="@string/subtext"
                 android:textColor="@color/text_color"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -51,7 +51,7 @@
                 android:background="@drawable/border"
                 android:fontFamily="@font/lato"
                 android:padding="4dp"
-                android:text="6 June, 11:55 AM"
+                android:text="@string/date"
                 android:textColor="@color/text_color"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -70,7 +70,7 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="20dp"
                 android:fontFamily="@font/lato_bold"
-                android:text="REMINDER"
+                android:text="@string/reminder"
                 android:textColor="@color/text_color"
                 android:textSize="16sp"
                 android:visibility="visible"
@@ -80,21 +80,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0" />
-
-            <RadioButton
-                android:id="@+id/checkButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:buttonTint="@color/radio_button_background"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/timeAndDate"
-                app:layout_constraintVertical_bias="1.0"
-                app:useMaterialThemeColors="true" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

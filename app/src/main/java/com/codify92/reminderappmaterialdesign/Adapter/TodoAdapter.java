@@ -128,7 +128,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
         }else if (number == 6) {
             holder.mCustomCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_dark_purple));
         }
-
     }
 
     @Override
