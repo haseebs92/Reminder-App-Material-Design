@@ -214,17 +214,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeAds(){
-        MobileAds.initialize(this, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
-                // Ads have been initialized
-                showBannerAd();
-                if (!adShown){
-                    loadInterstitialAd();
-                    adShown = true;
-                }
-
+        MobileAds.initialize(this, initializationStatus -> {
+            // Ads have been initialized
+            showBannerAd();
+            if (!adShown){
+                loadInterstitialAd();
+                adShown = true;
             }
+
         });
 
 
